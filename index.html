@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinú Connect | Portal Turístico Digital de Córdoba</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sinuCyan: '#06b6d4',
+                        sinuBlue: '#0284c7',
+                        sinuDark: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .view-layer {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+        }
+        .layer-hidden-right {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .layer-visible {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .drawer-hidden {
+            transform: translateX(-100%);
+        }
+        .drawer-visible {
+            transform: translateX(0);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased h-full overflow-x-hidden selection:bg-cyan-500 selection:text-white">
+
+    <!-- CABECERA SUPERIOR FIJA -->
+    <header class="sticky top-0 z-30 bg-slate-900 text-white shadow-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchMainTab('home')">
+                <div class="bg-cyan-500 text-slate-950 p-2 rounded-xl font-black shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-compass text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-tight">Sinú<span class="text-cyan-400">Connect</span></span>
+                    <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest -mt-1">Guía Oficial Córdoba</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-6 text-xs font-bold text-slate-300">
+                <button onclick="switchMainTab('home')" class="nav-link text-cyan-400 flex items-center gap-2 py-2 transition" id="nav-desk-home">
+                    <i class="fa-solid fa-house"></i> Inicio
+                </button>
+                <button onclick="switchMainTab('explore')" class="nav-link hover:text-cyan-400 flex items-center gap-2 py-2 transition" id="nav-desk-explore">
+                    <i class="fa-solid fa-map-location-dot"></i> Destinos
+                </button>
+                <button onclick="switchMainTab('events')" class="nav-link hover:text-cyan-400 flex items-center gap-2 py-2 transition" id="nav-desk-events">
+                    <i class="fa-solid fa-calendar-days"></i> Agenda
+                </button>
+                <button onclick="switchMainTab('saved')" class="nav-link hover:text-cyan-400 flex items-center gap-2 py-2 transition relative" id="nav-desk-saved">
+                    <i class="fa-solid fa-bookmark"></i> Guardados
+                    <span id="saved-count-desk" class="bg-amber-500 text-slate-900 px-1.5 py-0.5 rounded-full text-[9px] ml-1 hidden">0</span>
+                </button>
+            </nav>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleDrawer()" class="md:hidden bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-xl text-xs border border-slate-700 transition">
+                    <i class="fa-solid fa-sliders text-sm"></i>
+                </button>
+                <span class="hidden sm:inline-flex items-center gap-1.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[11px] font-bold px-3 py-1.5 rounded-full">
+                    <i class="fa-solid fa-qrcode text-xs"></i> QR Activo
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR DE VISTAS PRINCIPALES -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
+
+        <!-- VISTA 1: INICIO (HOME) -->
+        <section id="view-home" class="tab-view space-y-8 animate-fade-in block">
+            
+            <div class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-950 text-white rounded-3xl p-6 sm:p-10 overflow-hidden shadow-xl border border-slate-800">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-block bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold px-3 py-1 rounded-full mb-3 shadow-sm">
+                        ¡Bienvenido a Córdoba!
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-4 leading-tight">
+                        Tu puerta digital al turismo del <span class="text-cyan-400">Sinú y el Caribe</span>
+                    </h1>
+                    <p class="text-slate-300 text-xs sm:text-sm mb-6 leading-relaxed">
+                        Has accedido desde tu manilla inteligente. Explora nuestras guías completas, rutas ocultas y la riqueza cultural del departamento.
+                    </p>
+
+                    <div class="relative flex items-center shadow-lg rounded-2xl w-full max-w-lg">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 text-cyan-400 text-sm"></i>
+                        <input type="text" id="home-search" onkeypress="if(event.key === 'Enter') executeSearch('home-search')" placeholder="Buscar lugares, planes..." 
+                               class="w-full pl-11 pr-28 py-3.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 transition">
+                        <button onclick="executeSearch('home-search')" class="absolute right-2 top-1.5 bottom-1.5 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold px-4 rounded-xl text-xs transition">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-black text-slate-900">¿Qué buscas hoy?</h2>
+                    <button onclick="switchMainTab('explore')" class="text-xs font-bold text-cyan-600 hover:text-cyan-800 transition">Ver Todos <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div onclick="filterByCategory('playa')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-sky-300 transition cursor-pointer group">
+                        <div class="w-10 h-10 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-lg mb-3 group-hover:-translate-y-1 transition">
+                            <i class="fa-solid fa-umbrella-beach"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Playas y Costas</h3>
+                        <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">San Antero, Moñitos...</p>
+                    </div>
+                    <div onclick="filterByCategory('ecoturismo')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-cyan-300 transition cursor-pointer group">
+                        <div class="w-10 h-10 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center text-lg mb-3 group-hover:-translate-y-1 transition">
+                            <i class="fa-solid fa-tree"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Ecoturismo</h3>
+                        <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">Montería, Ayapel...</p>
+                    </div>
+                    <div onclick="filterByCategory('cultura')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition cursor-pointer group">
+                        <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-lg mb-3 group-hover:-translate-y-1 transition">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Cultura y Folclor</h3>
+                        <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">Cereté, San Pelayo...</p>
+                    </div>
+                    <div onclick="filterByCategory('historia')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-amber-300 transition cursor-pointer group">
+                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-lg mb-3 group-hover:-translate-y-1 transition">
+                            <i class="fa-solid fa-landmark"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Patrimonio</h3>
+                        <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">Lorica, Tuchín...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-lg font-black text-slate-900 mb-4">Destinos Imperdibles</h2>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" id="home-featured-grid">
+                    <!-- Llenado por JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 2: EXPLORAR -->
+        <section id="view-explore" class="tab-view hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h1 class="text-xl font-black text-slate-900">Catálogo Completo</h1>
+                    <p class="text-xs text-slate-500 mt-1">Explora los 14 municipios integrados a la red Sinú Connect.</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <div class="relative flex items-center w-full sm:w-56 shrink-0">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="explore-search" oninput="handleRealtimeSearch(this.value)" placeholder="Buscar destino..." 
+                               class="w-full pl-8 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-cyan-400 transition">
+                    </div>
+
+                    <div class="flex items-center gap-2 overflow-x-auto w-full no-scrollbar pb-1 sm:pb-0" id="explore-filter-buttons">
+                        <button onclick="filterExplore('all')" data-cat="all" class="exp-filter-btn active whitespace-nowrap bg-slate-900 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Todos</button>
+                        <button onclick="filterExplore('playa')" data-cat="playa" class="exp-filter-btn whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition border border-slate-200">Playas</button>
+                        <button onclick="filterExplore('ecoturismo')" data-cat="ecoturismo" class="exp-filter-btn whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition border border-slate-200">Ecoturismo</button>
+                        <button onclick="filterExplore('cultura')" data-cat="cultura" class="exp-filter-btn whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition border border-slate-200">Cultura</button>
+                        <button onclick="filterExplore('historia')" data-cat="historia" class="exp-filter-btn whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition border border-slate-200">Historia</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="explore-grid">
+                <!-- Llenado por JS -->
+            </div>
+        </section>
+
+        <!-- VISTA 3: AGENDA -->
+        <section id="view-events" class="tab-view hidden space-y-6">
+            <div class="relative bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-lg border border-slate-800 overflow-hidden">
+                <div class="absolute -right-10 -top-10 opacity-10 text-9xl text-cyan-400">
+                    <i class="fa-solid fa-masks-theater"></i>
+                </div>
+                <div class="relative z-10">
+                    <span class="inline-block text-[10px] font-bold uppercase tracking-widest text-cyan-400 bg-cyan-900/40 px-2 py-1 rounded mb-2">Cultura Viva</span>
+                    <h1 class="text-2xl sm:text-3xl font-black mt-1">Agenda de Festividades</h1>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-4"><span class="bg-cyan-50 text-cyan-700 font-black text-xs px-3 py-1.5 rounded-lg border border-cyan-100">MES DE JUNIO</span></div>
+                    <h3 class="font-bold text-slate-900 text-lg mb-1 leading-tight">Feria Nacional Ganadera</h3>
+                    <p class="text-[11px] font-bold text-cyan-600 mb-3 uppercase"><i class="fa-solid fa-location-dot mr-1"></i> Montería</p>
+                    <p class="text-xs text-slate-600">El evento masivo más importante de la capital.</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-4"><span class="bg-cyan-50 text-cyan-700 font-black text-xs px-3 py-1.5 rounded-lg border border-cyan-100">MES DE JULIO</span></div>
+                    <h3 class="font-bold text-slate-900 text-lg mb-1 leading-tight">Festival Nacional del Porro</h3>
+                    <p class="text-[11px] font-bold text-cyan-600 mb-3 uppercase"><i class="fa-solid fa-location-dot mr-1"></i> San Pelayo</p>
+                    <p class="text-xs text-slate-600">Encuentro de decenas de bandas pelayeras de viento.</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-4"><span class="bg-cyan-50 text-cyan-700 font-black text-xs px-3 py-1.5 rounded-lg border border-cyan-100">SEMANA SANTA</span></div>
+                    <h3 class="font-bold text-slate-900 text-lg mb-1 leading-tight">Festival Nacional del Burro</h3>
+                    <p class="text-[11px] font-bold text-cyan-600 mb-3 uppercase"><i class="fa-solid fa-location-dot mr-1"></i> San Antero</p>
+                    <p class="text-xs text-slate-600">Tradición folclórica y satírica única en Colombia.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 4: GUARDADOS -->
+        <section id="view-saved" class="tab-view hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-black text-slate-900">Mis Destinos Guardados</h1>
+                    <p class="text-xs text-slate-500 mt-1">Tu itinerario personalizado almacenado en este dispositivo.</p>
+                </div>
+                <div class="bg-amber-50 p-3 rounded-2xl">
+                    <i class="fa-solid fa-bookmark text-amber-500 text-xl"></i>
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="saved-grid"></div>
+        </section>
+    </main>
+
+    <!-- BARRA NAVEGACIÓN INFERIOR (MÓVILES) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-slate-200 text-slate-400 flex justify-around items-center h-[72px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] pb-safe">
+        <button onclick="switchMainTab('home')" class="app-tab-btn flex flex-col items-center gap-1.5 text-cyan-600 w-16" id="tab-mob-home">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider">Inicio</span>
+        </button>
+        <button onclick="switchMainTab('explore')" class="app-tab-btn flex flex-col items-center gap-1.5 hover:text-slate-800 transition w-16" id="tab-mob-explore">
+            <i class="fa-solid fa-map-location-dot text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider">Explorar</span>
+        </button>
+        <button onclick="switchMainTab('events')" class="app-tab-btn flex flex-col items-center gap-1.5 hover:text-slate-800 transition w-16" id="tab-mob-events">
+            <i class="fa-solid fa-calendar-days text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider">Eventos</span>
+        </button>
+        <button onclick="switchMainTab('saved')" class="app-tab-btn flex flex-col items-center gap-1.5 hover:text-slate-800 transition w-16 relative" id="tab-mob-saved">
+            <div class="relative">
+                <i class="fa-solid fa-bookmark text-lg"></i>
+                <span id="saved-badge-mob" class="hidden absolute -top-1.5 -right-2 bg-amber-500 text-slate-900 font-black text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border-2 border-white">0</span>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-wider">Viaje</span>
+        </button>
+    </nav>
+
+    <!-- CAPA DESLIZANTE DE SUBPÁGINA (FULL SCREEN DESTINATION) -->
+    <div id="subpage-layer" class="fixed inset-0 z-50 bg-slate-50 view-layer layer-hidden-right flex flex-col overflow-y-auto overflow-x-hidden">
+        
+        <div class="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between p-4 shadow-sm">
+            <button onclick="closeSubpage()" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-4 py-2.5 rounded-xl transition">
+                <i class="fa-solid fa-arrow-left"></i> Volver al menú
+            </button>
+            <button id="subpage-fav-btn" onclick="toggleSaveCurrentSubpage()" class="bg-white hover:bg-amber-50 text-slate-400 hover:text-amber-500 w-10 h-10 rounded-xl text-sm border border-slate-200 shadow-sm transition flex items-center justify-center">
+                <i class="fa-regular fa-bookmark" id="subpage-fav-icon"></i>
+            </button>
+        </div>
+
+        <div class="relative h-64 sm:h-[400px] bg-slate-900 text-white flex items-end">
+            <img id="sub-img" src="" alt="" onerror="this.src='https://via.placeholder.com/800x400?text=Foto+No+Encontrada'" class="absolute inset-0 w-full h-full object-cover opacity-70 mix-blend-overlay">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+            
+            <div class="relative z-10 p-6 sm:p-10 max-w-7xl mx-auto w-full">
+                <div class="flex items-center gap-2 mb-3">
+                    <span id="sub-number" class="bg-amber-500 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider shadow"></span>
+                    <span id="sub-category" class="bg-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded backdrop-blur-md uppercase tracking-wider border border-white/10"></span>
+                </div>
+                <h1 id="sub-title" class="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-md"></h1>
+                <p id="sub-subtitle" class="text-sm sm:text-lg text-cyan-300 font-bold mt-2 drop-shadow"></p>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto w-full p-6 sm:p-10 space-y-10 flex-1 pb-10">
+            <div class="grid lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2 space-y-4">
+                    <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sobre el Lugar</h3>
+                    <p id="sub-fullDesc" class="text-sm sm:text-base text-slate-700 leading-loose font-normal"></p>
+                </div>
+                <div id="sub-history-box" class="hidden bg-amber-50 border border-amber-200/60 p-6 rounded-3xl shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-5xl text-amber-600"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-amber-800 mb-3 relative z-10 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open"></i> Dato Histórico
+                    </h4>
+                    <p id="sub-history" class="text-xs sm:text-sm text-amber-900/90 leading-relaxed italic relative z-10"></p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 pt-4 border-t border-slate-200/60">
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h4 class="text-base font-black text-slate-900 mb-5 flex items-center gap-2">
+                        <div class="bg-sky-100 text-sky-600 w-8 h-8 rounded-lg flex items-center justify-center text-sm"><i class="fa-solid fa-map-pin"></i></div>
+                        ¿Qué vas a encontrar aquí?
+                    </h4>
+                    <ul id="sub-highlights" class="space-y-4 text-xs sm:text-sm text-slate-600"></ul>
+                </div>
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h4 class="text-base font-black text-slate-900 mb-5 flex items-center gap-2">
+                        <div class="bg-cyan-100 text-cyan-600 w-8 h-8 rounded-lg flex items-center justify-center text-sm"><i class="fa-solid fa-person-walking-luggage"></i></div>
+                        Actividades Recomendadas
+                    </h4>
+                    <ul id="sub-activities" class="space-y-4 text-xs sm:text-sm text-slate-600"></ul>
+                </div>
+            </div>
+
+            <div id="sub-gallery-box" class="hidden mt-10">
+                <h4 class="text-base font-black text-slate-900 mb-5 flex items-center gap-2">
+                    <div class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center text-sm"><i class="fa-solid fa-camera"></i></div>
+                    Galería del Destino
+                </h4>
+                <div id="sub-gallery" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x">
+                    <!-- Imágenes inyectadas por JS -->
+                </div>
+            </div>
+
+            <div class="bg-cyan-600 text-white p-6 sm:p-8 rounded-3xl shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
+                        <i class="fa-solid fa-lightbulb text-amber-300 text-xl"></i>
+                    </div>
+                    <span class="font-black uppercase tracking-wider text-xs">Tip del Viajero:</span>
+                </div>
+                <span id="sub-tip" class="text-xs sm:text-sm font-medium leading-relaxed sm:text-right flex-1"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL LATERAL DESLIZABLE (DRAWER DE FILTROS) -->
+    <div id="drawer-overlay" onclick="toggleDrawer()" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm hidden transition-opacity"></div>
+    <div id="filter-drawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 sm:w-80 bg-white shadow-2xl drawer-hidden transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between border-r border-slate-100">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-2 text-slate-900">
+                    <div class="bg-cyan-100 text-cyan-600 w-8 h-8 rounded-lg flex items-center justify-center text-sm"><i class="fa-solid fa-sliders"></i></div>
+                    <h3 class="font-black text-base">Filtros Rápidos</h3>
+                </div>
+                <button onclick="toggleDrawer()" class="bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 mb-2 block">Por Categoría</label>
+                <button onclick="applyDrawerFilter('all')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold hover:bg-slate-50 transition border border-transparent hover:border-slate-100 text-slate-700"><i class="fa-solid fa-layer-group text-slate-400"></i> Todos los destinos</button>
+                <button onclick="applyDrawerFilter('playa')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold hover:bg-sky-50 transition border border-transparent hover:border-sky-100 text-sky-700"><i class="fa-solid fa-umbrella-beach text-sky-400"></i> Playas y Costas</button>
+                <button onclick="applyDrawerFilter('ecoturismo')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold hover:bg-cyan-50 transition border border-transparent hover:border-cyan-100 text-cyan-700"><i class="fa-solid fa-tree text-cyan-400"></i> Ecoturismo y Agua</button>
+                <button onclick="applyDrawerFilter('cultura')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold hover:bg-purple-50 transition border border-transparent hover:border-purple-100 text-purple-700"><i class="fa-solid fa-music text-purple-400"></i> Cultura y Folclor</button>
+                <button onclick="applyDrawerFilter('historia')" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold hover:bg-amber-50 transition border border-transparent hover:border-amber-100 text-amber-700"><i class="fa-solid fa-landmark text-amber-400"></i> Historia y Patrimonio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS DE FUNCIONALIDAD Y BASE DE DATOS -->
+    <script>
+        const destinations = [
+            {
+                id: "01", name: "Montería", subtitle: "Capital Verde de Colombia y del Río Sinú", category: "ecoturismo", categoryLabel: "Ecoturismo y Agua",
+                img: "fotos/Montería 1.jpg", 
+                gallery: ["fotos/Montería 2.jpg", "fotos/Montería 3.jpg", "fotos/Montería 4.jpg", "fotos/Montería 5.jpg", "fotos/Montería 6.jpg", "fotos/Montería 7.jpg", "fotos/Montería 8.jpg", "fotos/Montería 9.jpg", "fotos/Montería 10.jpg", "fotos/Montería 11.jpg"],
+                shortDesc: "El parque lineal Ronda del Sinú, paseos tradicionales en planchón movidos por cable, fauna silvestre, el Muelle Turístico y la majestuosa Catedral San Jerónimo.",
+                fullDesc: "La Ronda del Sinú es el parque lineal más largo de América Latina y el eje ecológico de Montería. Este corredor une el desarrollo urbano con un bosque de galería tropical conservado a lo largo de la ribera del río Sinú. Un espacio público diseñado para conectar la vida ciudadana con la naturaleza.",
+                history: "El suelo de la Catedral San Jerónimo representa el nacimiento mismo de Montería, ya que allí se fundó en 1777 la primera iglesia de bahareque y paja.",
+                highlights: ["<strong>Fauna Silvestre en Libertad:</strong> Refugio natural donde monos aulladores, osos perezosos e iguanas gigantes habitan sin barreras.", "<strong>Teatrino y Artesanías:</strong> Escenarios de porro y danza.", "<strong>Paseo en Planchón:</strong> Embarcaciones techadas que cruzan el río sin motor."],
+                activities: ["Cruzar el río en planchón conectando la Ronda del Centro con la Ronda de Occidente.", "Realizar avistamiento fotográfico de perezosos e iguanas gigantes en la ribera."],
+                tip: "Visita la Ronda del Sinú al atardecer para ver cómo el sol tiñe las aguas del río de tonos dorados."
+            },
+            {
+                id: "02", name: "Santa Cruz de Lorica", subtitle: "Pueblo Patrimonio e Influencia Sirio-Libanesa", category: "historia", categoryLabel: "Historia y Patrimonio",
+                img: "fotos/Lorica 1.jpg",
+                gallery: ["fotos/Lorica 2.png", "fotos/Lorica 3.jpg", "fotos/Lorica 4.jpg", "fotos/Lorica 5.jpg"],
+                shortDesc: "El emblemático Mercado Público, arquitectura histórica y una rica mezcla cultural árabe e indígena a orillas del río Sinú.",
+                fullDesc: "Lorica es la joya histórica del Bajo Sinú. Su arquitectura resalta de inmediato por mezclar de forma única la influencia republicana con detalles de estilo árabe, herencia de los migrantes sirio-libaneses.",
+                history: "El Mercado Público fue inaugurado en 1929 para recibir barcos comerciales cargados de mercancía. La Parroquia de Santa Cruz es un rompecabezas arquitectónico único.",
+                highlights: ["<strong>Mercado Público:</strong> Estructura icónica roja y amarilla.", "<strong>Ciénaga Grande de Lorica:</strong> Humedal vital y refugio biodiverso."],
+                activities: ["Degustar el sancocho de gallina criolla o bocachico frito.", "Realizar un paseo en bote por la ciénaga."],
+                tip: "Camina por el centro histórico y presta atención a los detalles en hierro forjado."
+            },
+            {
+                id: "03", name: "San Antero", subtitle: "Bahía de Cispatá, Manglares y Volcán de Lodo", category: "playa", categoryLabel: "Playas y Costas",
+                img: "fotos/San Antero 1.jpg",
+                gallery: ["fotos/San Antero 2.jpg", "fotos/San Antero 3.jpg", "fotos/San Antero 4.jpg", "fotos/San Antero 5.jpg"],
+                shortDesc: "Santuario de manglares vírgenes, el terapéutico volcán de lodo arcilloso, y playas de oleaje muy tranquilo.",
+                fullDesc: "San Antero es un impresionante santuario ecoturístico. Es aquí donde el mar Caribe se mezcla con antiguos canales fluviales formando un laberinto de túneles verdes en uno de los bosques de manglar más grandes de Colombia.",
+                history: "La zona es sede de la estación ASOCAIMAN, organización comunitaria reconocida internacionalmente por salvar al caimán aguja de la extinción.",
+                highlights: ["<strong>Bahía de Cispatá:</strong> Pasadizos naturales y túneles de follaje.", "<strong>Volcán de Lodo:</strong> Formación geológica terapéutica."],
+                activities: ["Paseo en lancha guiada por locales hacia la boca de la bahía.", "Sumergirse en el baño arcilloso del volcán."],
+                tip: "Para el baño en el Volcán de Lodo, lleva ropa de baño desgastada y protector solar amigable."
+            },
+            {
+                id: "04", name: "Cereté", subtitle: "Capital Blanca y Cerebro Cultural del Sinú", category: "cultura", categoryLabel: "Cultura y Folclor",
+                img: "fotos/Cereté 1.jpg",
+                gallery: ["fotos/Cereté 2.jpg", "fotos/Cereté 3.png"],
+                shortDesc: "El Centro Cultural Raúl Gómez Jattin, la nostálgica Calle de las Flores y su arquitectura republicana.",
+                fullDesc: "Cereté es mundialmente conocido por su prolífica historia literaria y agrícola. Es la cuna de poetas y del oro blanco (algodón). Descubrir Cereté es caminar por sus antiguas viviendas con marcadas influencias republicanas.",
+                history: "El actual Centro Cultural funcionó por décadas como la antigua plaza de mercado. En 1999 fue transformado para homenajear al gran poeta cereteano Raúl Gómez Jattin.",
+                highlights: ["<strong>Centro Cultural Gómez Jattin:</strong> Espacio de encuentro artístico.", "<strong>Parroquia San Antonio de Padua:</strong> Iglesia imponente."],
+                activities: ["Recorrer a pie la arquitectura neoclásica de la Calle de las Flores.", "Visitar tiendas de arte y manualidades tradicionales."],
+                tip: "Si viajas en época de festivales, no te pierdas los recitales poéticos al aire libre en el Centro Cultural."
+            },
+            {
+                id: "05", name: "Planeta Rica", subtitle: "La Ciudad Bella y San Antonio de la Sabana", category: "cultura", categoryLabel: "Cultura y Folclor",
+                img: "fotos/Planeta Rica 1.jpg",
+                gallery: ["fotos/Planeta Rica 2.jpg", "fotos/Planeta Rica 3.jpg"],
+                shortDesc: "Tierra de raíces vallenatas, juglares, cultura ganadera y hermosos atardeceres en las colinas de la sabana.",
+                fullDesc: "Planeta Rica marca el inicio de la sabana cordobesa. Un municipio reconocido en el caribe por su profunda conexión con la música de acordeón, el folclor ganadero y sus plazas vibrantes.",
+                history: "Es conocida como la tierra del maestro y primer Rey Vallenato, Gilberto Alejandro Durán Díaz (Alejo Durán), quien inmortalizó al municipio en sus cantos.",
+                highlights: ["Parque Central iluminado.", "Monumento al Juglar Alejo Durán.", "Iglesia principal de colores distintivos."],
+                activities: ["Ruta cultural por la historia de la música sabanera.", "Degustar sueros costeños y quesos artesanales puros."],
+                tip: "Acompaña tus comidas locales con el tradicional suero atollabuey."
+            },
+            {
+                id: "06", name: "Puerto Escondido", subtitle: "Volcán Los Yecos y Ritmo Bullerengue", category: "playa", categoryLabel: "Playas y Costas",
+                img: "fotos/Puerto Escondido 1.jpg",
+                gallery: ["fotos/Puerto Escondido 2.jpg"],
+                shortDesc: "El volcán de lodo medicinal 'Los Yecos' a orillas del mar y cuna del ritmo ancestral Bullerengue.",
+                fullDesc: "Un paraíso afrocaribeño que combina los atractivos geológicos, como baños de lodo termal frente al océano, con el rescate de las raíces musicales traídas de África.",
+                history: "El territorio mantiene vivas las ruedas de bailes cantados (Bullerengue) transmitidos de generación en generación por matronas locales.",
+                highlights: ["Volcán de Lodo Los Yecos.", "Isla de la Culebra.", "Muelle turístico marino."],
+                activities: ["Tomar un baño relajante de lodo y luego lavarse en el mar.", "Participar en eventos de música y danza local."],
+                tip: "Prueba el tradicional pescado frito con patacón en los quioscos frente a la playa."
+            },
+            {
+                id: "07", name: "Moñitos", subtitle: "Acantilados en Punta Broqueles", category: "playa", categoryLabel: "Playas y Costas",
+                img: "fotos/Moñitos 1.jpg",
+                gallery: ["fotos/Moñitos 2.jpg"],
+                shortDesc: "Población de pescadores rodeada de cocoteros, hermosos acantilados marinos en Punta Broqueles y paz inigualable.",
+                fullDesc: "Destino completamente idílico diseñado para la desconexión total. Ofrece una de las postales naturales más vírgenes de Córdoba donde la selva baja se topa con el mar, complementado por hermosas cabañas de playa.",
+                history: "Destaca por mantener intactas las artes de pesca tradicionales en pequeñas embarcaciones de madera labrada a mano.",
+                highlights: ["Largo muelle turístico azul.", "Cabañas tradicionales techadas de palma.", "Playas vírgenes de arena suave."],
+                activities: ["Caminar por el muelle al atardecer.", "Descansar en hamacas frente a la línea de costa."],
+                tip: "Ideal para mochileros o parejas buscando alejarse del ruido de la ciudad en un eco-hotel."
+            },
+            {
+                id: "08", name: "San Bernardo del Viento", subtitle: "Desembocadura de Boca de Tinajones", category: "playa", categoryLabel: "Playas y Costas",
+                img: "fotos/San Bernardo 1.jpg", 
+                gallery: ["fotos/San Bernardo 2.jpg"], 
+                shortDesc: "El increíble punto geográfico donde el Río Sinú finalmente entrega sus aguas al Mar Caribe.",
+                fullDesc: "Con extensas playas bañadas por brisas constantes, este municipio marca el final de la travesía fluvial más importante del departamento. Es un epicentro para amantes del viento, surfistas y ecologistas.", 
+                history: "La zona es el lugar de un histórico cambio geológico donde la desembocadura del río Sinú formó un nuevo delta a mediados del siglo XX.", 
+                highlights: ["Delta de Boca de Tinajones.", "Avistamiento de aves.", "Letras y malecón turístico."], 
+                activities: ["Practicar Kitesurf aprovechando los fuertes vientos.", "Recorridos en kayak."], 
+                tip: "Visita al atardecer para ver el contraste del agua dulce y salada."
+            },
+            {
+                id: "09", name: "Los Córdobas", subtitle: "Cascadas del Río Canalete y Mar", category: "playa", categoryLabel: "Playas y Costas",
+                img: "fotos/Los Córdobas 1.jpg",
+                gallery: ["fotos/Los Córdobas 2.jpg"],
+                shortDesc: "Costas agrestes, extensos muelles de madera y un paisaje de agua dulce y salada conviviendo en armonía.",
+                fullDesc: "Un municipio limítrofe hacia la región del Urabá, caracterizado por una topografía única donde las corrientes de ríos bajan formando pozos naturales a muy corta distancia de la playa de arena dorada.",
+                history: "Fue paso histórico comercial costero antes de la creación de las carreteras modernas.",
+                highlights: ["Muelle artesanal fotogénico.", "Bandadas de aves marinas y gaviotas.", "Playas de oleaje sereno."],
+                activities: ["Contemplar las aves marinas alimentándose cerca del muelle.", "Caminar largas distancias por su línea costera."],
+                tip: "Aprovecha la hora dorada del atardecer para capturar fotografías increíbles en el muelle."
+            },
+            {
+                id: "10", name: "Ayapel", subtitle: "El Espejo de Agua Dulce más Grande", category: "ecoturismo", categoryLabel: "Ecoturismo y Agua",
+                img: "fotos/Ayapel 1.jpg",
+                gallery: ["fotos/Ayapel 2.jpg"],
+                shortDesc: "Inmensa Ciénaga Ramsar de 40.000 hectáreas ideal para la navegación, esquí acuático y atardeceres mágicos.",
+                fullDesc: "Paraíso acuático sin igual en el departamento. La inmensa Ciénaga de Ayapel domina el paisaje, creando islas internas y sustentando uno de los ecosistemas lacustres más importantes de Colombia. Desde el muelle principal se puede observar toda la inmensidad del agua.",
+                history: "Este territorio fue un asentamiento vital de la cultura precolombina Zenú, quienes aprovecharon la cuenca del río San Jorge para su complejo sistema de canales.",
+                highlights: ["Ciénaga de Ayapel (Humedal Ramsar).", "Parroquia San Jerónimo.", "Muelle y malecón turístico panorámico."],
+                activities: ["Navegar en lanchas rápidas o pontones de lujo por el centro de la ciénaga.", "Visitar el interior arquitectónico de su iglesia blanca central."],
+                tip: "Las fotografías panorámicas de la ciénaga al atardecer son consideradas de las más hermosas de Colombia."
+            },
+            {
+                id: "11", name: "Tierralta", subtitle: "Puerta al Paramillo y Embalse de Urrá", category: "ecoturismo", categoryLabel: "Ecoturismo y Agua",
+                img: "fotos/Tierralta 1.jpg", 
+                gallery: ["fotos/Tierralta 2.jpg"], 
+                shortDesc: "Embalse hidroeléctrico de Urrá, ríos cristalinos de montaña y la puerta al gran Parque Nacional Natural Paramillo.",
+                fullDesc: "Ofrece la geografía montañosa y selvática de Córdoba. Es un paraíso para los amantes del turismo verde profundo, con grandes cuerpos de agua artificiales y ríos prístinos como el Manso.", 
+                history: "Es el hogar ancestral de la comunidad indígena Emberá Katío y zona de hallazgos de inmenso valor para la historia indígena Sinuana.", 
+                highlights: ["Embalse Urrá I", "Parque Nacional Natural Paramillo", "Río Manso."], 
+                activities: ["Paseo en lancha por el gigantesco embalse.", "Senderismo ecológico de alta montaña."], 
+                tip: "Lleva binoculares para el avistamiento de fauna exótica y aves endémicas."
+            },
+            {
+                id: "12", name: "Tuchín", subtitle: "Cuna Zenú y del Sombrero Vueltiao", category: "historia", categoryLabel: "Historia y Patrimonio",
+                img: "fotos/Tuchín 1.jpg", 
+                gallery: ["fotos/Tuchín 2.png"], 
+                shortDesc: "Resguardo Indígena Zenú célebre mundialmente por la maestría y origen del icónico Sombrero Vueltiao.",
+                fullDesc: "Tuchín es el corazón y el alma de la artesanía de Colombia. Sus calles están repletas de color, de tiras de caña flecha secándose al sol y de familias enteras dedicadas al oficio que los hace únicos en el mundo.", 
+                history: "El trenzado geométrico del Sombrero Vueltiao proviene de una tradición milenaria indígena Zenú. Cada figura (llamada 'pinta') representa animales o elementos cosmogónicos.", 
+                highlights: ["Monumento al Sombrero Vueltiao.", "Mercado central de artesanías en Caña Flecha.", "Plaza principal."], 
+                activities: ["Aprender el proceso botánico y de tejido con los artesanos locales.", "Adquirir artesanías auténticas de exportación."], 
+                tip: "Pregunta al artesano el significado de la 'pinta' (figura) de tu sombrero."
+            },
+            {
+                id: "13", name: "San Pelayo", subtitle: "Capital Mundial del Porro y las Bandas", category: "cultura", categoryLabel: "Cultura y Folclor",
+                img: "fotos/San Pelayo 1.jpg", 
+                gallery: ["fotos/San Pelayo 2.jpg"], 
+                shortDesc: "Cuna de la música de viento caribeña, de los bombos, clarinetes y de la mítica bailadora María Varilla.",
+                fullDesc: "En San Pelayo el Porro no es solo música, es la estructura de su sociedad. Cada esquina respira notas de viento y los platillos resuenan como la esencia pura del departamento.", 
+                history: "El municipio institucionalizó en los años 70 el Festival Nacional del Porro, naciendo como un evento a orillas del río Sinú para que las bandas de pueblo no desaparecieran.", 
+                highlights: ["Complejo Cultural del Porro.", "Alboradas y Fandangos tradicionales."], 
+                activities: ["Bailar Fandango tradicional en la plaza principal.", "Disfrutar de la gastronomía a base de maíz."], 
+                tip: "Si bailas Fandango, la tradición marca llevar paquetes de velas encendidas en la mano derecha."
+            },
+            {
+                id: "14", name: "Ciénaga de Oro", subtitle: "Tradición Nazarena y Casabe Ancestral", category: "historia", categoryLabel: "Historia y Patrimonio",
+                img: "fotos/Ciénaga de oro 1.jpg",
+                gallery: ["fotos/Ciénaga de oro 2.jpg"],
+                shortDesc: "Pueblo de arraigadas costumbres de Semana Santa, casonas coloniales y la elaboración artesanal del Casabe.",
+                fullDesc: "Ciénaga de Oro resalta en el plano turístico por su devoción cultural, su patrimonio arquitectónico sabanero muy conservado y por ser la capital gastronómica de los amasijos de yuca prensada (Casabe).",
+                history: "Conserva una tradición que data de siglos pasados con la 'Hermandad de los Nazarenos', quienes organizan las procesiones coloniales con pasos pesados labrados en madera antigua.",
+                highlights: ["Centro Histórico de Arquitectura Sabanera.", "Iglesia San José.", "Las 'Casaberas' tradicionales."],
+                activities: ["Ver en vivo el prensado y cocción en grandes sartenes de barro del Casabe ancestral.", "Hacer un recorrido por el arte sacro e imaginería religiosa del pueblo."],
+                tip: "Prueba el casabe caliente con queso rallado encima o la versión dulce rellena de coco."
+            }
+        ];
+
+        let savedDestinations = JSON.parse(localStorage.getItem('sinu_saved') || '[]');
+        let currentSubpageId = null;
+
+        function updateSavedState() {
+            localStorage.setItem('sinu_saved', JSON.stringify(savedDestinations));
+            
+            const deskCount = document.getElementById('saved-count-desk');
+            const mobBadge = document.getElementById('saved-badge-mob');
+            
+            deskCount.innerText = savedDestinations.length;
+            mobBadge.innerText = savedDestinations.length;
+
+            if (savedDestinations.length > 0) {
+                deskCount.classList.remove('hidden');
+                mobBadge.classList.remove('hidden');
+            } else {
+                deskCount.classList.add('hidden');
+                mobBadge.classList.add('hidden');
+            }
+        }
+
+        function toggleSaveDestination(id, event) {
+            if(event) event.stopPropagation(); 
+            const index = savedDestinations.indexOf(id);
+            if (index > -1) savedDestinations.splice(index, 1);
+            else savedDestinations.push(id);
+            
+            updateSavedState();
+            renderAllGrids();
+            if (currentSubpageId === id) updateSubpageFavBtn();
+        }
+
+        function updateSubpageFavBtn() {
+            const btn = document.getElementById('subpage-fav-btn');
+            const icon = document.getElementById('subpage-fav-icon');
+            if (savedDestinations.includes(currentSubpageId)) {
+                btn.classList.add('bg-amber-100', 'text-amber-600', 'border-amber-300');
+                btn.classList.remove('bg-white', 'text-slate-400', 'border-slate-200');
+                icon.className = 'fa-solid fa-bookmark';
+            } else {
+                btn.classList.remove('bg-amber-100', 'text-amber-600', 'border-amber-300');
+                btn.classList.add('bg-white', 'text-slate-400', 'border-slate-200');
+                icon.className = 'fa-regular fa-bookmark';
+            }
+        }
+
+        function toggleSaveCurrentSubpage() {
+            if (currentSubpageId) toggleSaveDestination(currentSubpageId);
+        }
+
+        function createCardHTML(item) {
+            const isSaved = savedDestinations.includes(item.id);
+            return `
+                <article onclick="openSubpage('${item.id}')" class="bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-200 flex flex-col group cursor-pointer relative">
+                    <div class="relative h-48 overflow-hidden bg-slate-100 flex items-center justify-center">
+                        <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/400x300?text=Foto+No+Encontrada'" class="w-full h-full object-cover mix-blend-multiply group-hover:scale-110 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent"></div>
+                        <span class="absolute top-4 left-4 bg-amber-400 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-md shadow uppercase">${item.id}</span>
+                        <button onclick="toggleSaveDestination('${item.id}', event)" class="absolute top-4 right-4 bg-white/20 hover:bg-white text-white hover:text-amber-500 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition border border-white/30 z-10">
+                            <i class="${isSaved ? 'fa-solid text-amber-400' : 'fa-regular'} fa-bookmark text-sm"></i>
+                        </button>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-cyan-300 bg-black/50 px-2 py-1 rounded backdrop-blur-sm border border-white/10">${item.categoryLabel}</span>
+                            <h3 class="text-2xl font-black text-white mt-1 drop-shadow-sm">${item.name}</h3>
+                        </div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <p class="text-[11px] font-bold text-slate-500 mb-1 uppercase tracking-wider">${item.subtitle}</p>
+                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed line-clamp-3">${item.shortDesc}</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-800 group-hover:text-cyan-600 transition">
+                            <span>Leer más detalles</span>
+                            <div class="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-cyan-100 flex items-center justify-center transition">
+                                <i class="fa-solid fa-arrow-right text-[10px] transition group-hover:translate-x-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderAllGrids() {
+            document.getElementById('home-featured-grid').innerHTML = destinations.slice(0, 4).map(item => createCardHTML(item)).join('');
+            document.getElementById('explore-grid').innerHTML = destinations.map(item => createCardHTML(item)).join('');
+            
+            const savedGrid = document.getElementById('saved-grid');
+            const savedItems = destinations.filter(d => savedDestinations.includes(d.id));
+            if (savedItems.length === 0) {
+                savedGrid.innerHTML = `<div class="col-span-full text-center py-16 px-4 bg-slate-50 rounded-3xl border border-dashed border-slate-300"><p class="font-black text-slate-700 text-lg">Aún no hay destinos guardados</p></div>`;
+            } else {
+                savedGrid.innerHTML = savedItems.map(item => createCardHTML(item)).join('');
+            }
+        }
+
+        function switchMainTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => {
+                view.classList.add('hidden');
+                view.classList.remove('animate-fade-in', 'block');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`view-${tabId}`).classList.add('animate-fade-in', 'block');
+            
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('text-cyan-400'));
+            const deskNav = document.getElementById(`nav-desk-${tabId}`);
+            if(deskNav) deskNav.classList.add('text-cyan-400');
+
+            document.querySelectorAll('.app-tab-btn').forEach(btn => {
+                btn.classList.remove('text-cyan-600');
+                btn.classList.add('text-slate-400');
+            });
+            const mobBtn = document.getElementById(`tab-mob-${tabId}`);
+            if(mobBtn) {
+                mobBtn.classList.remove('text-slate-400', 'hover:text-slate-800');
+                mobBtn.classList.add('text-cyan-600');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openSubpage(id) {
+            const item = destinations.find(d => d.id === id);
+            if (!item) return;
+            currentSubpageId = id;
+
+            document.getElementById('sub-img').src = item.img;
+            document.getElementById('sub-number').innerText = item.id;
+            document.getElementById('sub-category').innerText = item.categoryLabel;
+            document.getElementById('sub-title').innerText = item.name;
+            document.getElementById('sub-subtitle').innerText = item.subtitle;
+            document.getElementById('sub-fullDesc').innerHTML = item.fullDesc;
+            document.getElementById('sub-tip').innerText = item.tip;
+
+            const historyBox = document.getElementById('sub-history-box');
+            if (item.history) {
+                document.getElementById('sub-history').innerHTML = item.history;
+                historyBox.classList.remove('hidden');
+            } else {
+                historyBox.classList.add('hidden');
+            }
+
+            document.getElementById('sub-highlights').innerHTML = item.highlights.map(h => `<li class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100"><i class="fa-solid fa-check text-sky-500 mt-1 text-sm"></i><span class="flex-1">${h}</span></li>`).join('');
+            document.getElementById('sub-activities').innerHTML = item.activities.map(a => `<li class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100"><i class="fa-solid fa-arrow-right text-cyan-500 mt-1 text-sm"></i><span class="flex-1">${a}</span></li>`).join('');
+
+            const galleryBox = document.getElementById('sub-gallery-box');
+            if (item.gallery && item.gallery.length > 0) {
+                document.getElementById('sub-gallery').innerHTML = item.gallery.map(imgSrc => `
+                    <img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/300x200?text=Foto+No+Encontrada'" class="h-48 w-72 object-cover rounded-2xl snap-center shadow-sm border border-slate-200 shrink-0" alt="Galería">
+                `).join('');
+                galleryBox.classList.remove('hidden');
+            } else {
+                galleryBox.classList.add('hidden');
+            }
+
+            updateSubpageFavBtn();
+
+            const layer = document.getElementById('subpage-layer');
+            layer.classList.remove('layer-hidden-right');
+            layer.classList.add('layer-visible');
+            document.body.style.overflow = 'hidden'; 
+            layer.scrollTo(0,0);
+        }
+
+        function closeSubpage() {
+            const layer = document.getElementById('subpage-layer');
+            layer.classList.remove('layer-visible');
+            layer.classList.add('layer-hidden-right');
+            document.body.style.overflow = 'auto';
+            currentSubpageId = null;
+        }
+
+        function executeSearch(inputId) {
+            const query = document.getElementById(inputId).value;
+            switchMainTab('explore');
+            document.getElementById('explore-search').value = query;
+            handleRealtimeSearch(query);
+        }
+
+        function handleRealtimeSearch(query) {
+            query = query.toLowerCase().trim();
+            
+            document.querySelectorAll('.exp-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white', 'active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const allBtn = document.querySelector('.exp-filter-btn[data-cat="all"]');
+            if(allBtn && !query) {
+                allBtn.classList.add('bg-slate-900', 'text-white', 'active');
+                allBtn.classList.remove('bg-slate-100', 'text-slate-700');
+            }
+
+            if (!query) {
+                renderAllGrids();
+                return;
+            }
+            
+            const filtered = destinations.filter(d => 
+                d.name.toLowerCase().includes(query) || d.subtitle.toLowerCase().includes(query) || d.shortDesc.toLowerCase().includes(query)
+            );
+            
+            const exploreGrid = document.getElementById('explore-grid');
+            exploreGrid.innerHTML = filtered.length > 0
+                ? filtered.map(item => createCardHTML(item)).join('')
+                : `<div class="col-span-full text-center py-12 font-bold text-slate-500"><i class="fa-solid fa-magnifying-glass mb-2 text-2xl text-slate-300"></i><br>No se encontraron resultados para "${query}".</div>`;
+        }
+
+        function filterByCategory(cat) {
+            switchMainTab('explore');
+            filterExplore(cat);
+        }
+
+        function filterExplore(category) {
+            document.getElementById('explore-search').value = ""; 
+            
+            document.querySelectorAll('.exp-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white', 'active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+                if (btn.getAttribute('data-cat') === category) {
+                    btn.classList.remove('bg-slate-100', 'text-slate-700');
+                    btn.classList.add('bg-slate-900', 'text-white', 'active');
+                }
+            });
+
+            const exploreGrid = document.getElementById('explore-grid');
+            if (category === 'all') {
+                exploreGrid.innerHTML = destinations.map(item => createCardHTML(item)).join('');
+            } else {
+                exploreGrid.innerHTML = destinations.filter(d => d.category === category).map(item => createCardHTML(item)).join('');
+            }
+        }
+
+        function toggleDrawer() {
+            const drawer = document.getElementById('filter-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            if (drawer.classList.contains('drawer-hidden')) {
+                drawer.classList.remove('drawer-hidden');
+                drawer.classList.add('drawer-visible');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.remove('drawer-visible');
+                drawer.classList.add('drawer-hidden');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function applyDrawerFilter(cat) {
+            toggleDrawer(); 
+            filterByCategory(cat); 
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateSavedState();
+            renderAllGrids();
+        });
+    </script>
+</body>
+</html>
